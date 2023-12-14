@@ -1,8 +1,8 @@
 package org.eu.yaesakura.springsecurity6vue3.repository;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.eu.yaesakura.springsecurity6vue3.domain.entity.User;
-import org.springframework.stereotype.Repository;
 
 /**
  * 用户持久层
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Repository;
  * @author YaeSakura
  */
 
-@Repository
+@Mapper
 public interface UserRepository {
 
-    @Select("SELECT * FROM t_user WHERE username = #{username}")
-    User queryUserByUsername(String username);
+    @Select("SELECT * FROM user WHERE username = #{username}")
+    User getUserByUsername(String username);
 }

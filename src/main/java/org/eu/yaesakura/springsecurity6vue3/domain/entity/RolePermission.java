@@ -3,15 +3,15 @@ package org.eu.yaesakura.springsecurity6vue3.domain.entity;
 import lombok.Data;
 
 /**
- * 角色实体类
+ * 角色权限关系实体类
  *
  * @author YaeSakura
  */
 
 @Data
-public class Role {
+public class RolePermission {
     // 角色ID
-    private Integer id;
-    // 角色名称
-    private String name;
+    private Integer roleId;
+    // 权限ID
+    private Integer permissionId;
 }

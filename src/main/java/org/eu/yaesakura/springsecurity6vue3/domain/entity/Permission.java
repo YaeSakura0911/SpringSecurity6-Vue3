@@ -10,4 +10,10 @@ import lombok.Data;
 
 @Data
 public class Permission {
+    // 权限ID
+    private Integer id;
+    // 权限代码
+    private String code;
+    // 权限名称
+    private String name;
 }

@@ -4,6 +4,7 @@ import org.eu.yaesakura.springsecurity6vue3.filter.CustomAuthenticationFilter;
 import org.eu.yaesakura.springsecurity6vue3.handler.CustomAuthenticationFailureHandler;
 import org.eu.yaesakura.springsecurity6vue3.handler.CustomAuthenticationSuccessHandler;
 import org.eu.yaesakura.springsecurity6vue3.handler.CustomLogoutSuccessHandler;
+import org.eu.yaesakura.springsecurity6vue3.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -42,6 +43,8 @@ import java.util.List;
 @Configuration
 public class SpringSecurityConfiguration {
 
+    @Autowired
+    private UserService userService;
     @Autowired
     private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     @Autowired
@@ -86,20 +89,25 @@ public class SpringSecurityConfiguration {
     @Bean
     public CustomAuthenticationFilter customAuthenticationFilter() {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter("/login");
+        // 配置认证管理器
+        customAuthenticationFilter.setAuthenticationManager(authenticationManager());
         // 配置认证成功处理器
         customAuthenticationFilter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler);
         // 配置认证失败处理器
         customAuthenticationFilter.setAuthenticationFailureHandler(customAuthenticationFailureHandler);
-        customAuthenticationFilter.setAuthenticationManager(authenticationManager());
-        customAuthenticationFilter.setSessionAuthenticationStrategy();
+        // 配置会话认证策略
+        customAuthenticationFilter.setSessionAuthenticationStrategy(compositeSessionAuthenticationStrategy());
         return customAuthenticationFilter;
     }
 
+    /**
+     * 认证管理器
+     */
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
-        daoAuthenticationProvider.setUserDetailsService();
+        daoAuthenticationProvider.setPasswordEncoder(argon2PasswordEncoder());
+        daoAuthenticationProvider.setUserDetailsService(userService);
 
         return new ProviderManager(daoAuthenticationProvider);
     }
@@ -139,8 +147,11 @@ public class SpringSecurityConfiguration {
         return new CompositeSessionAuthenticationStrategy(delegateStrategies);
     }
 
+    /**
+     * 密码编码器
+     */
     @Bean
-    public PasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
+    public PasswordEncoder argon2PasswordEncoder() {
+        return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     }
 }

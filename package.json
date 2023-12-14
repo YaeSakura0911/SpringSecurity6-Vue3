@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "ant-design-vue": "^4.0.7",
-    "axios": "^1.6.2"
-  }
-}
